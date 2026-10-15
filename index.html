@@ -184,7 +184,7 @@ function renderTable(type){
  if(type==='mamuRolls'||type==='noor')cells=[x.date,x.item,money(x.qty),money(x.rate),money(x.total),money(x.paid),money(x.balance),x.paymentDate,x.notes];
  if(type==='catalogic')cells=[x.date,x.supplier,x.item,money(x.qtyPurchased),money(x.purchaseRate),money(x.purchaseTotal),money(x.qtySold),money(x.saleRate),money(x.salesTotal),money(x.profit),money(x.paid),money(x.supplierBalance)];
  if(type==='personal')cells=[x.date,x.type,x.person,x.details,money(x.moneyIn),money(x.expense),money(x.lent),money(x.repaidToMe),money(x.iRepaid),money(x.receivable),x.notes];
- return '<tr>'+cells.map((v,i)=>td(v, (type==='mamu'&&[2,4,5].includes(i))?'num':((type!=='mamu'&&[2,3,4,5,6,7,8,9,10,11].includes(i))?'num':'' ) ) .join('')+td(actionBtns(type,x))+'</tr>'
+ return '<tr>'+cells.map((v,i)=>td(v, (type==='mamu'&&[2,4,5].includes(i))?'num':((type!=='mamu'&&[2,3,4,5,6,7,8,9,10,11].includes(i))?'num':''))).join('')+td(actionBtns(type,x))+'</tr>'
  }).join('');
 }
 function renderSummary(){
