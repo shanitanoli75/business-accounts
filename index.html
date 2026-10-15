@@ -1,243 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Business & Personal Accounts</title>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Business & Personal Accounts</title>
 <style>
-:root{--navy:#17365d;--blue:#2463a6;--bg:#f3f6fb;--card:#fff;--text:#172334;--muted:#68778b;--border:#dce4ef;--green:#18794e;--red:#b42318}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-header{background:linear-gradient(120deg,#17365d,#2463a6);color:#fff;padding:22px 18px}
-header h1{margin:0 0 7px;font-size:24px}header p{margin:0;color:#e5eefb;font-size:14px}
-.wrap{max-width:1400px;margin:auto;padding:18px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:18px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px;box-shadow:0 2px 8px #102a4308}
-.kicker{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}.amount{font-weight:700;font-size:23px;margin-top:7px;overflow-wrap:anywhere}
-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
-button,.btn{border:0;border-radius:8px;padding:10px 13px;background:var(--navy);color:#fff;font-weight:600;cursor:pointer;font-size:13px}
-button.secondary{background:#e8eef6;color:var(--navy)}button.danger{background:#b42318}button:hover{filter:brightness(.96)}
-.tab.active{background:#2463a6}.panel{display:none}.panel.active{display:block}
-.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-.panel h2{margin:0;font-size:20px}
-.table-wrap{overflow:auto;background:#fff;border:1px solid var(--border);border-radius:12px}
-table{border-collapse:collapse;width:100%;min-width:850px;font-size:13px}
-th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
-th{background:#eaf0f8;color:#213b5c;position:sticky;top:0}
-td.num{text-align:right;font-variant-numeric:tabular-nums}
-form.entry{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;background:#fff;padding:15px;border:1px solid var(--border);border-radius:12px;margin-bottom:14px}
-label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
-input,select,textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:7px;background:white;color:var(--text);font:inherit}
-.form-actions{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
-.note{font-size:12px;color:var(--muted);line-height:1.5;margin:12px 0}
-.empty{text-align:center;color:var(--muted);padding:24px}
-.actions{display:flex;gap:5px}.small{font-size:11px;padding:6px 8px}
-footer{color:var(--muted);font-size:12px;text-align:center;padding:25px 12px}
-@media(max-width:600px){header h1{font-size:20px}.wrap{padding:11px}.amount{font-size:20px}.panel-head button{flex:1}}
-</style>
-</head>
-<body>
-<header><div class="wrap" style="padding:0 4px">
-<h1>Business & Personal Accounts</h1>
-<p>Track money received, transfers, barcode rolls, Noor's account, Catalogic purchases, profit and personal expenses.</p>
-</div></header>
-<main class="wrap">
-<section class="cards" id="summary"></section>
-<nav id="tabs">
-<button class="tab active" data-tab="dashboard">Dashboard</button>
-<button class="tab" data-tab="mamu">Mamu Transfers</button>
-<button class="tab" data-tab="mamuRolls">Barcode Rolls — Mamu</button>
-<button class="tab" data-tab="noor">Noor Account</button>
-<button class="tab" data-tab="catalogic">Catalogic Purchase & Sales</button>
-<button class="tab" data-tab="personal">Personal Accounts</button>
-<button class="tab" data-tab="backup">Backup / Settings</button>
-</nav>
-
-<section class="panel active" id="dashboard">
-<div class="panel-head"><h2>Dashboard</h2><button class="secondary" onclick="renderAll()">Refresh totals</button></div>
-<div class="card">
-<p><b>Quick guide</b></p>
-<p class="note">Use the tabs above to add each transaction with its date. Totals and outstanding balances update automatically. Use Backup / Settings to export your records or restore them on another device.</p>
-<p class="note"><b>Important:</b> this starter version stores data in the browser on the device you use. A public website link can open anywhere, but the records do not automatically sync between devices unless cloud storage is connected.</p>
-</div>
-<div class="card" style="margin-top:12px"><h3>Account totals</h3><div id="dashTotals"></div></div>
-</section>
-
-<section class="panel" id="mamu">
-<div class="panel-head"><h2>Mamu Transfers</h2><button onclick="exportCSV('mamu')">Export CSV</button></div>
-<form class="entry" id="form-mamu">
-<input type="hidden" name="id">
-<div><label>Date</label><input name="date" type="date" required></div>
-<div><label>Details / Money Received From Mamu</label><input name="details" placeholder="e.g. Money received"></div>
-<div><label>Money Received (Rs)</label><input name="received" type="number" min="0" step=".01" value="0"></div>
-<div><label>Sent To</label><input name="sentTo" placeholder="Person / account"></div>
-<div><label>Money Sent (Rs)</label><input name="sent" type="number" min="0" step=".01" value="0"></div>
-<div><label>Reference / Account</label><input name="reference"></div>
-<div><label>Notes</label><input name="notes"></div>
-<div class="form-actions"><button type="submit">Save transaction</button><button type="button" class="secondary" onclick="resetForm('mamu')">Clear</button></div>
-</form>
-<div class="table-wrap"><table><thead><tr><th>Date</th><th>Details</th><th>Received</th><th>Sent To</th><th>Sent</th><th>Difference</th><th>Reference</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="table-mamu"></tbody></table></div>
-</section>
-
-<section class="panel" id="mamuRolls">
-<div class="panel-head"><h2>Barcode Rolls — Mamu</h2><button onclick="exportCSV('mamuRolls')">Export CSV</button></div>
-<form class="entry" id="form-mamuRolls">
-<input type="hidden" name="id">
-<div><label>Date</label><input name="date" type="date" required></div><div><label>Item / Barcode Roll</label><input name="item" value="Barcode Roll"></div>
-<div><label>Quantity (Rolls)</label><input name="qty" type="number" min="0" step="1" value="0"></div><div><label>Rate per Roll (Rs)</label><input name="rate" type="number" min="0" step=".01" value="0"></div>
-<div><label>Payment Received (Rs)</label><input name="paid" type="number" min="0" step=".01" value="0"></div><div><label>Payment Date</label><input name="paymentDate" type="date"></div><div><label>Notes</label><input name="notes"></div>
-<div class="form-actions"><button type="submit">Save transaction</button><button type="button" class="secondary" onclick="resetForm('mamuRolls')">Clear</button></div>
-</form>
-<div class="table-wrap"><table><thead><tr><th>Date</th><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th><th>Payment Received</th><th>Balance Due</th><th>Latest Payment Date</th><th>Payment History</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="table-mamuRolls"></tbody></table></div>
-</section>
-
-<section class="panel" id="noor">
-<div class="panel-head"><h2>Noor Account</h2><button onclick="exportCSV('noor')">Export CSV</button></div>
-<form class="entry" id="form-noor">
-<input type="hidden" name="id"><div><label>Date</label><input name="date" type="date" required></div><div><label>Item / Details</label><input name="item" placeholder="Goods delivered"></div>
-<div><label>Quantity</label><input name="qty" type="number" min="0" step=".01" value="0"></div><div><label>Rate (Rs)</label><input name="rate" type="number" min="0" step=".01" value="0"></div>
-<div><label>Payment Received (Rs)</label><input name="paid" type="number" min="0" step=".01" value="0"></div><div><label>Payment Date</label><input name="paymentDate" type="date"></div><div><label>Notes</label><input name="notes"></div>
-<div class="form-actions"><button type="submit">Save transaction</button><button type="button" class="secondary" onclick="resetForm('noor')">Clear</button></div>
-</form>
-<div class="table-wrap"><table><thead><tr><th>Date</th><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th><th>Payment Received</th><th>Balance Due</th><th>Latest Payment Date</th><th>Payment History</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="table-noor"></tbody></table></div>
-</section>
-
-<section class="panel" id="catalogic">
-<div class="panel-head"><h2>Catalogic Purchase & Sales</h2><button onclick="exportCSV('catalogic')">Export CSV</button></div>
-<form class="entry" id="form-catalogic">
-<input type="hidden" name="id"><div><label>Purchase Date</label><input name="date" type="date" required></div><div><label>Supplier</label><input name="supplier" value="Catalogic"></div><div><label>Item</label><input name="item" value="Barcode"></div>
-<div><label>Quantity Purchased</label><input name="qtyPurchased" type="number" min="0" step="1" value="0"></div><div><label>Purchase Rate (Rs)</label><input name="purchaseRate" type="number" min="0" step=".01" value="0"></div>
-<div><label>Quantity Sold</label><input name="qtySold" type="number" min="0" step="1" value="0"></div><div><label>Sale Rate (Rs)</label><input name="saleRate" type="number" min="0" step=".01" value="0"></div>
-<div><label>Paid to Catalogic (Rs)</label><input name="paid" type="number" min="0" step=".01" value="0"></div><div><label>Payment Date</label><input name="paymentDate" type="date"></div><div><label>Notes</label><input name="notes"></div>
-<div class="form-actions"><button type="submit">Save transaction</button><button type="button" class="secondary" onclick="resetForm('catalogic')">Clear</button></div>
-</form>
-<div class="table-wrap"><table><thead><tr><th>Purchase Date</th><th>Supplier</th><th>Item</th><th>Qty Purchased</th><th>Purchase Rate</th><th>Purchase Total</th><th>Qty Sold</th><th>Sale Rate</th><th>Sales Total</th><th>Gross Profit</th><th>Paid</th><th>Supplier Balance</th><th>Actions</th></tr></thead><tbody id="table-catalogic"></tbody></table></div>
-</section>
-
-<section class="panel" id="personal">
-<div class="panel-head"><h2>Personal Accounts</h2><button onclick="exportCSV('personal')">Export CSV</button></div>
-<form class="entry" id="form-personal">
-<input type="hidden" name="id"><div><label>Date</label><input name="date" type="date" required></div>
-<div><label>Transaction Type</label><select name="type"><option>Income</option><option>Expense</option><option>Money Lent</option><option>Loan Repayment Received</option><option>Debt/Loan Paid by Me</option><option>Other</option></select></div>
-<div><label>Income Source / Paid To</label><input name="person" placeholder="Person or source"></div><div><label>Details</label><input name="details"></div>
-<div><label>Money In (Rs)</label><input name="moneyIn" type="number" min="0" step=".01" value="0"></div><div><label>Expense / Money Out (Rs)</label><input name="expense" type="number" min="0" step=".01" value="0"></div>
-<div><label>Money Lent (Rs)</label><input name="lent" type="number" min="0" step=".01" value="0"></div><div><label>Money Repaid to Me (Rs)</label><input name="repaidToMe" type="number" min="0" step=".01" value="0"></div>
-<div><label>Money I Repaid (Rs)</label><input name="iRepaid" type="number" min="0" step=".01" value="0"></div><div><label>Payment Method / Reference</label><input name="reference"></div><div><label>Notes</label><input name="notes"></div>
-<div class="form-actions"><button type="submit">Save transaction</button><button type="button" class="secondary" onclick="resetForm('personal')">Clear</button></div>
-</form>
-<div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Source / Paid To</th><th>Details</th><th>Money In</th><th>Expense</th><th>Money Lent</th><th>Repaid to Me</th><th>I Repaid</th><th>Receivable Balance</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="table-personal"></tbody></table></div>
-</section>
-
-<section class="panel" id="backup">
-<div class="panel-head"><h2>Backup / Settings</h2></div>
-<div class="card">
-<h3>Export or restore your records</h3>
-<p class="note">Download a JSON backup regularly. To use your records on another device, export the backup here and import it on that device.</p>
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0">
-<button onclick="downloadBackup()">Download Full Backup</button>
-<label class="btn" style="display:inline-block;cursor:pointer">Import Backup JSON <input id="importFile" type="file" accept=".json,application/json" style="display:none" onchange="importBackup(event)"></label>
-<button class="secondary" onclick="downloadAllCSV()">Export All Sheets as CSV Files</button>
-<button class="danger" onclick="clearAll()">Delete All Local Data</button>
-</div>
-<p class="note"><b>Privacy:</b> this version saves information in this browser only. Do not use a public/shared computer for private financial records. A public GitHub Pages link does not itself provide secure cloud syncing or user login.</p>
-</div>
-</section>
-<footer>Business & Personal Accounts • Starter web app</footer>
-</main>
+:root{--navy:#17365d;--blue:#2463a6;--bg:#f3f6fb;--card:#fff;--text:#172334;--muted:#68778b;--border:#dce4ef;--green:#18794e;--red:#b42318}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}header{background:linear-gradient(120deg,#17365d,#2463a6);color:white;padding:20px}header .inner,main{max-width:1450px;margin:auto}header h1{margin:0 0 6px;font-size:24px}header p{margin:0;color:#e5eefb;font-size:14px}.wrap{padding:18px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px}.card{background:white;border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:0 2px 8px #102a4308}.kicker{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}.amount{font-weight:700;font-size:21px;margin-top:7px;overflow-wrap:anywhere}nav,.subtabs{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 14px}button{border:0;border-radius:8px;padding:10px 12px;background:var(--navy);color:white;font-weight:600;cursor:pointer;font-size:13px}button.secondary{background:#e8eef6;color:var(--navy)}button.active{background:var(--blue);color:white}button.danger{background:var(--red)}button.small{font-size:11px;padding:6px 8px}.panel{display:none}.panel.active{display:block}.subpanel{display:none}.subpanel.active{display:block}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 12px}.panel-head h2{margin:0;font-size:20px}.subheading{font-size:17px;margin:8px 0 12px}.entry{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px;background:white;padding:15px;border:1px solid var(--border);border-radius:12px;margin-bottom:14px}.entry label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}input,select,textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:7px;background:white;color:var(--text);font:inherit}.actions{display:flex;gap:5px}.table-wrap{overflow:auto;background:white;border:1px solid var(--border);border-radius:12px}table{border-collapse:collapse;width:100%;min-width:850px;font-size:13px}th,td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}th{background:#eaf0f8;color:#213b5c;position:sticky;top:0}td.num{text-align:right;font-variant-numeric:tabular-nums}.empty{text-align:center;color:var(--muted);padding:22px}.note{font-size:12px;color:var(--muted);line-height:1.5}.form-actions{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.status{font-size:12px;color:var(--green);margin:8px 0}footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}@media(max-width:600px){.wrap{padding:10px}header h1{font-size:20px}.amount{font-size:18px}}
+</style></head><body>
+<header><div class="inner"><h1>Business & Personal Accounts</h1><p>Separate money received, transfers, barcode sales, payments, stock, profit and personal expenses.</p></div></header>
+<main class="wrap"><section class="cards" id="topSummary"></section><nav id="mainTabs"><button class="active" data-main="dashboard">Dashboard</button><button data-main="mamu">Mamu Transfers</button><button data-main="mamuRolls">Barcode Rolls — Mamu</button><button data-main="noor">Noor Account</button><button data-main="catalogic">Catalogic / Stock / Sales</button><button data-main="personal">Personal Accounts</button><button data-main="backup">Backup / Settings</button></nav>
+<section class="panel active" id="dashboard"><div class="panel-head"><h2>Dashboard — Account Totals</h2><button class="secondary" onclick="renderAll()">Refresh totals</button></div><div class="cards" id="dashboardCards"></div><div class="card"><b>How to use</b><p class="note">Each account has separate subtabs and separate forms. Use Edit or Delete in the Actions column. Payments are recorded by date in their own tabs. This app stores records in this browser only; use Backup / Settings to export data before changing the software.</p><p class="note"><b>Important:</b> uploading a new version to GitHub Pages does not transfer browser-local records to another device. Keep a backup before replacing the file.</p></div></section>
+<section class="panel" id="mamu"><div class="panel-head"><h2>Mamu Transfers</h2></div><div class="subtabs" id="mamuTabs"></div><div id="mamuSubpanels"></div></section>
+<section class="panel" id="mamuRolls"><div class="panel-head"><h2>Barcode Rolls — Mamu</h2></div><div class="subtabs" id="mamuRollTabs"></div><div id="mamuRollSubpanels"></div></section>
+<section class="panel" id="noor"><div class="panel-head"><h2>Noor Account</h2></div><div class="subtabs" id="noorTabs"></div><div id="noorSubpanels"></div></section>
+<section class="panel" id="catalogic"><div class="panel-head"><h2>Catalogic Purchase, Stock & Sales</h2></div><div class="subtabs" id="catalogicTabs"></div><div id="catalogicSubpanels"></div></section>
+<section class="panel" id="personal"><div class="panel-head"><h2>Personal Accounts</h2></div><div class="subtabs" id="personalTabs"></div><div id="personalSubpanels"></div></section>
+<section class="panel" id="backup"><div class="panel-head"><h2>Backup / Settings</h2></div><div class="card"><p><button onclick="downloadBackup()">Download Full Backup (JSON)</button> <button onclick="downloadAllCSV()">Export All CSVs</button></p><label>Restore backup JSON</label><input type="file" accept="application/json,.json" onchange="importBackup(event)"><p style="margin-top:14px"><button class="danger" onclick="clearAll()">Delete All Local Records</button></p><p class="note">Private financial records are stored in this browser. GitHub Pages is public hosting, not a private database. Download a backup before replacing this file.</p></div></section>
+<footer>Business & Personal Accounts • Separated tabs edition</footer></main>
 <script>
-const KEY='businessAccountsAppV1';
-const sections=['mamu','mamuRolls','noor','catalogic','personal'];
-let db=loadDB();
-function loadDB(){try{return JSON.parse(localStorage.getItem(KEY))||{mamu:[],mamuRolls:[],noor:[],catalogic:[],personal:[]}}catch(e){return {mamu:[],mamuRolls:[],noor:[],catalogic:[],personal:[]}}}
-function saveDB(){localStorage.setItem(KEY,JSON.stringify(db));renderAll()}
-function n(v){return Number(v)||0}
-function money(v){return new Intl.NumberFormat('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n(v))}
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function total(arr,fn){return arr.reduce((s,x)=>s+n(fn(x)),0)}
-function derived(type,x){
- if(type==='mamuRolls'||type==='noor'){let total=n(x.qty)*n(x.rate),paid=paymentTotal(x);return {...x,total,paid,balance:total-paid}}
- if(type==='catalogic'){let purchaseTotal=n(x.qtyPurchased)*n(x.purchaseRate),salesTotal=n(x.qtySold)*n(x.saleRate),profit=n(x.qtySold)*(n(x.saleRate)-n(x.purchaseRate)),paid=paymentTotal(x);return {...x,purchaseTotal,salesTotal,profit,paid,supplierBalance:purchaseTotal-paid}}
- if(type==='mamu')return {...x,difference:n(x.received)-n(x.sent)}
- if(type==='personal')return {...x,receivable:n(x.lent)-n(x.repaidToMe)}
- return x;
-}
-function fields(form){return Object.fromEntries(new FormData(form).entries())}
-function numFields(obj,keys){keys.forEach(k=>obj[k]=n(obj[k]));return obj}
-function resetForm(type){const f=document.getElementById('form-'+type);f.reset();f.elements.id.value='';const d=f.elements.date;if(d)d.value=new Date().toISOString().slice(0,10);if(type==='mamuRolls')f.elements.item.value='Barcode Roll';if(type==='catalogic'){f.elements.supplier.value='Catalogic';f.elements.item.value='Barcode'}}
-document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab))}));
-sections.forEach(type=>{
- const f=document.getElementById('form-'+type);resetForm(type);
- f.addEventListener('submit',e=>{e.preventDefault();let x=fields(f);let id=x.id||String(Date.now())+Math.random().toString(16).slice(2);x.id=id;
- const numeric={mamu:['received','sent'],mamuRolls:['qty','rate','paid'],noor:['qty','rate','paid'],catalogic:['qtyPurchased','purchaseRate','qtySold','saleRate','paid'],personal:['moneyIn','expense','lent','repaidToMe','iRepaid']}[type];
- numFields(x,numeric);
- const i=db[type].findIndex(z=>z.id===id);
- if(['mamuRolls','noor','catalogic'].includes(type)){
-   const old=i>=0?db[type][i]:null;
-   if(old&&Array.isArray(old.payments)){x.payments=old.payments; x.paid=paymentTotal(old);}
-   else {x.payments=[];if(n(x.paid)>0)x.payments.push({date:x.paymentDate||x.date,amount:n(x.paid),note:'Payment entered on transaction'});}
- }
- if(i>=0)db[type][i]=x;else db[type].push(x);saveDB();resetForm(type);
- });
-});
-function edit(type,id){let x=db[type].find(z=>z.id===id);if(!x)return;let f=document.getElementById('form-'+type);Object.keys(x).forEach(k=>{if(f.elements[k])f.elements[k].value=x[k]??''});if(f.elements.paid)f.elements.paid.value=paymentTotal(x);document.querySelector(`[data-tab="${type}"]`).click();window.scrollTo({top:0,behavior:'smooth'})}
-function del(type,id){if(confirm('Delete this transaction?')){db[type]=db[type].filter(x=>x.id!==id);saveDB()}}
-function actionBtns(type,x){
- const payBtn=['mamuRolls','noor','catalogic'].includes(type)?`<button class="small" onclick="addPayment('${type}','${x.id}')">Add Payment</button>`:'';
- return `<div class="actions">${payBtn}<button class="small secondary" onclick="edit('${type}','${x.id}')">Edit</button><button class="small danger" onclick="del('${type}','${x.id}')">Delete</button></div>`
-}
-function paymentTotal(x){return Array.isArray(x.payments)?total(x.payments,p=>p.amount):n(x.paid)}
-function paymentSummary(x){
- const ps=Array.isArray(x.payments)?x.payments:[];
- return ps.length?ps.map(p=>`${p.date||'No date'}: Rs ${money(p.amount)}${p.note?' ('+p.note+')':''}`).join(' | '):(n(x.paid)>0?`${x.paymentDate||'Date not set'}: Rs ${money(x.paid)}`:'No payments yet');
-}
-function addPayment(type,id){
- const x=db[type].find(z=>z.id===id);if(!x)return;
- const date=prompt('Payment received/paid date (YYYY-MM-DD):',new Date().toISOString().slice(0,10));if(date===null)return;
- const amount=prompt(type==='catalogic'?'Amount PAID to Catalogic (Rs):':'Amount PAYMENT RECEIVED (Rs):','0');if(amount===null)return;
- const value=Number(amount);if(!Number.isFinite(value)||value<=0){alert('Please enter an amount greater than zero.');return}
- const note=prompt('Payment reference / note (optional):','')||'';
- if(!Array.isArray(x.payments)){x.payments=[];if(n(x.paid)>0)x.payments.push({date:x.paymentDate||x.date,amount:n(x.paid),note:'Existing payment'});}
- x.payments.push({date,amount:value,note});
- x.paid=paymentTotal(x);x.paymentDate=date;
- saveDB();
-}
-
-function td(v,cls=''){return `<td class="${cls}">${esc(v)}</td>`}
-function renderTable(type){
- const body=document.getElementById('table-'+type);let rows=[...db[type]].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
- if(!rows.length){body.innerHTML=`<tr><td colspan="20" class="empty">No transactions yet. Add one using the form above.</td></tr>`;return}
- body.innerHTML=rows.map(raw=>{let x=derived(type,raw), cells=[];
- if(type==='mamu')cells=[x.date,x.details,money(x.received),x.sentTo,money(x.sent),money(x.difference),x.reference,x.notes];
- if(type==='mamuRolls'||type==='noor')cells=[x.date,x.item,money(x.qty),money(x.rate),money(x.total),money(x.paid),money(x.balance),x.paymentDate,paymentSummary(x),x.notes];
- if(type==='catalogic')cells=[x.date,x.supplier,x.item,money(x.qtyPurchased),money(x.purchaseRate),money(x.purchaseTotal),money(x.qtySold),money(x.saleRate),money(x.salesTotal),money(x.profit),money(x.paid),money(x.supplierBalance),x.paymentDate,paymentSummary(x)];
- if(type==='personal')cells=[x.date,x.type,x.person,x.details,money(x.moneyIn),money(x.expense),money(x.lent),money(x.repaidToMe),money(x.iRepaid),money(x.receivable),x.notes];
- return '<tr>'+cells.map((v,i)=>td(v, (type==='mamu'&&[2,4,5].includes(i))?'num':((type!=='mamu'&&[2,3,4,5,6,7,8,9,10,11].includes(i))?'num':''))).join('')+'<td>'+actionBtns(type,x)+'</td></tr>'
- }).join('');
-}
-function renderSummary(){
- const mReceived=total(db.mamu,x=>x.received),mSent=total(db.mamu,x=>x.sent);
- const mrSales=total(db.mamuRolls,x=>derived('mamuRolls',x).total),mrPaid=total(db.mamuRolls,x=>x.paid);
- const noorSales=total(db.noor,x=>derived('noor',x).total),noorPaid=total(db.noor,x=>x.paid);
- const cPurchase=total(db.catalogic,x=>derived('catalogic',x).purchaseTotal),cPaid=total(db.catalogic,x=>x.paid),cProfit=total(db.catalogic,x=>derived('catalogic',x).profit);
- const income=total(db.personal,x=>x.moneyIn),expense=total(db.personal,x=>x.expense),lent=total(db.personal,x=>x.lent),repaid=total(db.personal,x=>x.repaidToMe),iRepaid=total(db.personal,x=>x.iRepaid);
- const cards=[
- ['Mamu Funds Difference',mReceived-mSent],['Mamu Barcode Balance',mrSales-mrPaid],['Noor Balance Due',noorSales-noorPaid],['Catalogic Supplier Due',cPurchase-cPaid],['Catalogic Gross Profit',cProfit],['Personal Net Cash Movement',income-expense-iRepaid],['Money Owed to You',lent-repaid]
- ];
- document.getElementById('summary').innerHTML=cards.map(([k,v])=>`<div class="card"><div class="kicker">${k}</div><div class="amount">Rs ${money(v)}</div></div>`).join('');
- document.getElementById('dashTotals').innerHTML=`<p>Mamu money received: <b>Rs ${money(mReceived)}</b> · Mamu transfers sent: <b>Rs ${money(mSent)}</b></p>
- <p>Barcode rolls sold to Mamu: <b>Rs ${money(mrSales)}</b> · Payment received: <b>Rs ${money(mrPaid)}</b></p>
- <p>Goods given to Noor: <b>Rs ${money(noorSales)}</b> · Payment received: <b>Rs ${money(noorPaid)}</b></p>
- <p>Catalogic purchases: <b>Rs ${money(cPurchase)}</b> · Paid: <b>Rs ${money(cPaid)}</b> · Gross profit estimate: <b>Rs ${money(cProfit)}</b></p>
- <p>Personal income: <b>Rs ${money(income)}</b> · Expenses: <b>Rs ${money(expense)}</b> · Money lent: <b>Rs ${money(lent)}</b> · Repaid to you: <b>Rs ${money(repaid)}</b> · You repaid: <b>Rs ${money(iRepaid)}</b></p>`;
-}
-function renderAll(){sections.forEach(renderTable);renderSummary()}
-function download(name,content,type){let blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
-function downloadBackup(){download('business-accounts-backup.json',JSON.stringify(db,null,2),'application/json')}
-function importBackup(e){let file=e.target.files[0];if(!file)return;let r=new FileReader();r.onload=()=>{try{let parsed=JSON.parse(r.result);if(!sections.every(k=>Array.isArray(parsed[k])))throw Error('Invalid backup');if(confirm('Import will replace the current data in this browser. Continue?')){db=parsed;saveDB();alert('Backup imported successfully.')}}catch(err){alert('Could not import this file. Please choose a valid backup JSON.')}e.target.value=''};r.readAsText(file)}
-function csvEscape(v){let s=String(v??'');return '"'+s.replace(/"/g,'""')+'"'}
-function exportCSV(type){let arr=db[type].map(x=>derived(type,x));if(!arr.length){alert('No records to export yet.');return}let keys=[...new Set(arr.flatMap(Object.keys))].filter(k=>k!=='id');let csv=[keys.map(csvEscape).join(','),...arr.map(x=>keys.map(k=>csvEscape(x[k])).join(','))].join('\r\n');download(type+'.csv','\ufeff'+csv,'text/csv;charset=utf-8')}
-function downloadAllCSV(){sections.forEach(type=>{if(db[type].length)exportCSV(type)})}
-function clearAll(){if(confirm('This permanently deletes all records stored in this browser. Download a backup first if needed. Are you sure?')){db={mamu:[],mamuRolls:[],noor:[],catalogic:[],personal:[]};saveDB()}}
-renderAll();
-</script>
-</body>
-</html>
+const KEY='businessAccountsAppV1', NEWKEY='businessAccountsAppV2';
+const today=()=>new Date().toISOString().slice(0,10), num=v=>Number(v)||0, money=v=>new Intl.NumberFormat('en-PK',{minimumFractionDigits:2,maximumFractionDigits:2}).format(num(v));
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const blank=()=>({mamuReceipts:[],mamuTransfers:[],mamuRollSales:[],mamuRollPayments:[],noorSales:[],noorPayments:[],catalogicPurchases:[],catalogicSupplierPayments:[],catalogicSales:[],catalogicCustomerPayments:[],personalIncome:[],personalLoans:[],personalRepayments:[],personalExpenses:[]});
+function load(){try{let v=JSON.parse(localStorage.getItem(NEWKEY));if(v&&v.mamuReceipts)return {...blank(),...v};}catch(e){} let old;try{old=JSON.parse(localStorage.getItem(KEY))}catch(e){} let d=blank();if(old){(old.mamu||[]).forEach(x=>{if(num(x.received)>0)d.mamuReceipts.push({id:x.id+'r',date:x.date,amount:num(x.received),from:x.details||'Mamu',reference:x.reference||'',notes:x.notes||''});if(num(x.sent)>0)d.mamuTransfers.push({id:x.id+'s',date:x.date,person:x.sentTo||'',amount:num(x.sent),reference:x.reference||'',notes:x.notes||''})});(old.mamuRolls||[]).forEach(x=>{d.mamuRollSales.push({id:x.id,date:x.date,item:x.item||'Barcode Roll',qty:num(x.qty),rate:num(x.rate),notes:x.notes||''});(x.payments||[]).forEach(p=>d.mamuRollPayments.push({id:String(Date.now())+Math.random(),date:p.date,amount:num(p.amount),reference:p.note||'',notes:'Migrated payment'}));});(old.noor||[]).forEach(x=>{d.noorSales.push({id:x.id,date:x.date,item:x.item||'Goods',qty:num(x.qty),rate:num(x.rate),notes:x.notes||''});(x.payments||[]).forEach(p=>d.noorPayments.push({id:String(Date.now())+Math.random(),date:p.date,amount:num(p.amount),reference:p.note||'',notes:'Migrated payment'}));});(old.catalogic||[]).forEach(x=>{d.catalogicPurchases.push({id:x.id,date:x.date,item:x.item||'Barcode',qty:num(x.qtyPurchased),rate:num(x.purchaseRate),notes:''});(x.payments||[]).forEach(p=>d.catalogicSupplierPayments.push({id:String(Date.now())+Math.random(),date:p.date,amount:num(p.amount),reference:p.note||'',notes:'Migrated payment'}));if(num(x.qtySold)>0)d.catalogicSales.push({id:x.id+'sale',date:x.date,item:x.item||'Barcode',qty:num(x.qtySold),rate:num(x.saleRate),costRate:num(x.purchaseRate),customer:'',notes:''})});(old.personal||[]).forEach(x=>{if(num(x.moneyIn)>0)d.personalIncome.push({id:x.id+'i',date:x.date,source:x.person||'Income',amount:num(x.moneyIn),notes:x.details||''});if(num(x.lent)>0)d.personalLoans.push({id:x.id+'l',date:x.date,person:x.person||'',amount:num(x.lent),notes:x.details||''});if(num(x.repaidToMe)>0)d.personalRepayments.push({id:x.id+'r',date:x.date,person:x.person||'',amount:num(x.repaidToMe),notes:x.details||''});if(num(x.expense)>0)d.personalExpenses.push({id:x.id+'e',date:x.date,category:x.type||'Expense',amount:num(x.expense),details:x.details||'',notes:x.notes||''})})}return d}
+let db=load(), current={};const defs={
+mamu:{host:'mamuSubpanels',tabs:'mamuTabs',views:[['received','Money Received Only','mamuReceipts',[['date','Date','date'],['from','Received From','text'],['amount','Money Received (Rs)','number'],['reference','Reference / Account','text'],['notes','Notes','text']]],['sent','Transfer Sent Only','mamuTransfers',[['date','Date','date'],['person','Sent To / Person','text'],['amount','Money Sent (Rs)','number'],['reference','Reference / Account','text'],['notes','Description / Notes','text']]],['all','All Mamu Transactions',null,[]]]},
+mamuRolls:{host:'mamuRollSubpanels',tabs:'mamuRollTabs',views:[['sales','Barcode Rolls Given to Mamu','mamuRollSales',[['date','Date','date'],['item','Barcode Roll / Item','text'],['qty','Quantity (Rolls)','number'],['rate','Rate per Roll (Rs)','number'],['notes','Notes','text']]],['payments','Payments Received from Mamu','mamuRollPayments',[['date','Payment Date','date'],['amount','Payment Received (Rs)','number'],['reference','Reference / Account','text'],['notes','Notes','text']]]]},
+noor:{host:'noorSubpanels',tabs:'noorTabs',views:[['sales','Goods Given to Noor','noorSales',[['date','Date','date'],['item','Item / Barcode Roll','text'],['qty','Quantity','number'],['rate','Rate (Rs)','number'],['notes','Notes','text']]],['payments','Payments Received from Noor','noorPayments',[['date','Payment Date','date'],['amount','Payment Received (Rs)','number'],['reference','Reference / Account','text'],['notes','Notes','text']]]]},
+catalogic:{host:'catalogicSubpanels',tabs:'catalogicTabs',views:[['purchases','Purchases from Catalogic','catalogicPurchases',[['date','Purchase Date','date'],['item','Item','text'],['qty','Quantity Purchased','number'],['rate','Purchase Rate (Rs)','number'],['notes','Notes','text']]],['supplierPayments','Payments Paid to Catalogic','catalogicSupplierPayments',[['date','Payment Date','date'],['amount','Amount Paid (Rs)','number'],['reference','Reference / Account','text'],['notes','Notes','text']]],['stock','Current Stock','stock',[]],['sales','Goods Sold / Given to Customers','catalogicSales',[['date','Sale Date','date'],['customer','Customer / Given To','text'],['item','Item','text'],['qty','Quantity Sold','number'],['rate','Sale Rate (Rs)','number'],['costRate','Cost Rate (Rs)','number'],['notes','Notes','text']]],['customerPayments','Payments Received from Customers','catalogicCustomerPayments',[['date','Payment Date','date'],['customer','Received From','text'],['amount','Amount Received (Rs)','number'],['reference','Reference / Account','text'],['notes','Notes','text']]]]},
+personal:{host:'personalSubpanels',tabs:'personalTabs',views:[['income','Money Received / Income','personalIncome',[['date','Date','date'],['source','Received From / Source','text'],['amount','Amount Received (Rs)','number'],['reference','Reference','text'],['notes','Notes','text']]],['loans','Money Lent / Given on Credit','personalLoans',[['date','Date','date'],['person','Person Given To','text'],['amount','Amount Lent (Rs)','number'],['purpose','Purpose','text'],['notes','Notes','text']]],['repayments','Money Returned to You','personalRepayments',[['date','Payment Date','date'],['person','Received From','text'],['amount','Amount Repaid (Rs)','number'],['reference','Reference','text'],['notes','Notes','text']]],['expenses','Personal Expenses','personalExpenses',[['date','Date','date'],['category','Expense Category (Food, Travel, etc.)','text'],['amount','Amount Spent (Rs)','number'],['details','What was it for?','text'],['notes','Notes','text']]]]}};
+function sum(a,f){return a.reduce((s,x)=>s+num(f(x)),0)}function totalRows(key,fn){return sum(db[key]||[],fn)}function value(x,k){return k==='total'?num(x.qty)*num(x.rate):num(x[k])}
+function renderDefs(){Object.entries(defs).forEach(([group,def])=>{let tabs=document.getElementById(def.tabs),host=document.getElementById(def.host);tabs.innerHTML='';host.innerHTML='';def.views.forEach((v,i)=>{let b=document.createElement('button');b.className='secondary'+(i===0?' active':'');b.textContent=v[1];b.onclick=()=>switchSub(group,v[0]);tabs.appendChild(b);let p=document.createElement('div');p.className='subpanel'+(i===0?' active':'');p.id='sub-'+group+'-'+v[0];host.appendChild(p);if(v[0]==='all'){p.innerHTML=`<div class="cards" id="mamuAllCards"></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Details / Person</th><th>Received (Rs)</th><th>Sent (Rs)</th><th>Reference</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="body-mamuAll"></tbody></table></div>`}else if(v[0]==='stock'){p.innerHTML=`<div class="cards" id="stockCards"></div><div class="table-wrap"><table><thead><tr><th>Item</th><th>Purchased Qty</th><th>Sold Qty</th><th>Stock Remaining</th><th>Purchase Rate (Rs)</th><th>Stock Value (Rs)</th></tr></thead><tbody id="body-stock"></tbody></table></div>`}else{p.innerHTML=`<div class="cards" id="cards-${v[2]}"></div><div class="panel-head"><h3 class="subheading">${esc(v[1])} — Add / Edit Entry</h3><button class="secondary" onclick="exportCSV('${v[2]}')">Export CSV</button></div><form class="entry" id="form-${v[2]}" onsubmit="saveEntry(event,'${v[2]}')"><input type="hidden" name="id">${v[3].map(f=>`<div><label>${esc(f[1])}</label><input name="${f[0]}" type="${f[2]}" ${f[2]==='number'?'min="0" step="0.01"':''} ${f[0]==='date'?'required':''} ${f[0]==='amount'||f[0]==='qty'||f[0]==='rate'?'required':''} ${f[0]==='date'?'value="'+today()+'"':''} placeholder="${f[2]==='number'?'0':''}"></div>`).join('')}<div class="form-actions"><button type="submit">Save Entry</button><button type="button" class="secondary" onclick="resetEntry('${v[2]}')">Clear</button></div></form><div class="table-wrap"><table><thead><tr id="head-${v[2]}"></tr></thead><tbody id="body-${v[2]}"></tbody></table></div>`;document.getElementById('head-'+v[2]).innerHTML='<th>Date</th>'+v[3].filter(f=>f[0]!=='date').map(f=>'<th>'+esc(f[1])+'</th>').join('')+'<th>Total (Rs)</th><th>Actions</th>';resetEntry(v[2]);}});switchSub(group,def.views[0][0])})}
+function switchSub(group,view){current[group]=view;let d=defs[group];[...document.getElementById(d.tabs).children].forEach((b,i)=>b.classList.toggle('active',d.views[i][0]===view));d.views.forEach(v=>document.getElementById('sub-'+group+'-'+v[0]).classList.toggle('active',v[0]===view));renderAll()}
+function switchMain(id){document.querySelectorAll('[data-main]').forEach(b=>b.classList.toggle('active',b.dataset.main===id));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));}
+document.querySelectorAll('[data-main]').forEach(b=>b.addEventListener('click',()=>switchMain(b.dataset.main)));
+function resetEntry(key){let f=document.getElementById('form-'+key);if(!f)return;f.reset();f.elements.id.value='';if(f.elements.date)f.elements.date.value=today()}
+function saveEntry(e,key){e.preventDefault();let f=e.target,x=Object.fromEntries(new FormData(f).entries());x.id=x.id||String(Date.now())+Math.random().toString(16).slice(2);for(let k in x)if(['amount','qty','rate','costRate'].includes(k))x[k]=num(x[k]);let i=db[key].findIndex(z=>z.id===x.id);if(i>=0)db[key][i]=x;else db[key].push(x);persist();resetEntry(key)}
+function editEntry(key,id){let x=db[key].find(z=>z.id===id),f=document.getElementById('form-'+key);if(!x||!f)return;Object.keys(x).forEach(k=>{if(f.elements[k])f.elements[k].value=x[k]??''});let group=Object.keys(defs).find(g=>defs[g].views.some(v=>v[2]===key));if(group){switchMain(group);switchSub(group,defs[group].views.find(v=>v[2]===key)[0])}f.scrollIntoView({behavior:'smooth',block:'center'})}
+function deleteEntry(key,id){if(confirm('Delete this entry?')){db[key]=db[key].filter(x=>x.id!==id);persist()}}
+function persist(){localStorage.setItem(NEWKEY,JSON.stringify(db));renderAll()}
+function action(key,x){return `<div class="actions"><button class="small secondary" onclick="editEntry('${key}','${x.id}')">Edit</button><button class="small danger" onclick="deleteEntry('${key}','${x.id}')">Delete</button></div>`}
+function renderData(key,fields,calc){let body=document.getElementById('body-'+key);if(!body)return;let rows=[...(db[key]||[])].sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(!rows.length){body.innerHTML=`<tr><td colspan="${fields.length+3}" class="empty">No entries yet. Add the first entry above.</td></tr>`;return}body.innerHTML=rows.map(x=>{let total=calc?calc(x):num(x.amount);return `<tr><td>${esc(x.date)}</td>${fields.filter(f=>f[0]!=='date').map(f=>`<td class="${['amount','qty','rate','costRate'].includes(f[0])?'num':''}">${esc(['amount','qty','rate','costRate'].includes(f[0])?money(x[f[0]]):x[f[0]])}</td>`).join('')}<td class="num">${money(total)}</td><td>${action(key,x)}</td></tr>`}).join('')}
+function renderAll(){Object.values(defs).forEach(d=>d.views.forEach(v=>{if(v[2]&&v[2]!=='stock')renderData(v[2],v[3],x=>v[2].includes('Sales')||v[2]==='catalogicPurchases'||v[2]==='noorSales'||v[2]==='mamuRollSales'?num(x.qty)*num(x.rate):num(x.amount))}));renderMamuAll();renderStock();renderSummary()}
+function renderMamuAll(){let body=document.getElementById('body-mamuAll');if(!body)return;let rows=[...db.mamuReceipts.map(x=>({...x,kind:'Received',person:x.from,received:num(x.amount),sent:0})),...db.mamuTransfers.map(x=>({...x,kind:'Transfer Sent',person:x.person,received:0,sent:num(x.amount)}))].sort((a,b)=>(b.date||'').localeCompare(a.date||''));document.getElementById('mamuAllCards').innerHTML=[['Total Received',sum(db.mamuReceipts,x=>x.amount)],['Total Sent',sum(db.mamuTransfers,x=>x.amount)],['Difference',sum(db.mamuReceipts,x=>x.amount)-sum(db.mamuTransfers,x=>x.amount)]].map(([k,v])=>`<div class="card"><div class="kicker">${k}</div><div class="amount">Rs ${money(v)}</div></div>`).join('');body.innerHTML=rows.length?rows.map(x=>`<tr><td>${esc(x.date)}</td><td>${x.kind}</td><td>${esc(x.person||'')}</td><td class="num">${money(x.received)}</td><td class="num">${money(x.sent)}</td><td>${esc(x.reference||'')}</td><td>${esc(x.notes||'')}</td><td>${action(x.kind==='Received'?'mamuReceipts':'mamuTransfers',x)}</td></tr>`).join(''):'<tr><td colspan="8" class="empty">No Mamu transactions yet.</td></tr>'}
+function renderStock(){let b=document.getElementById('body-stock');if(!b)return;let map={};db.catalogicPurchases.forEach(x=>{let k=x.item||'Item';map[k]??={item:k,purchased:0,sold:0,rate:num(x.rate)};map[k].purchased+=num(x.qty);map[k].rate=num(x.rate)});db.catalogicSales.forEach(x=>{let k=x.item||'Item';map[k]??={item:k,purchased:0,sold:0,rate:num(x.costRate)};map[k].sold+=num(x.qty)});let rows=Object.values(map);document.getElementById('stockCards').innerHTML=[['Total Purchased Qty',sum(rows,x=>x.purchased)],['Total Sold Qty',sum(rows,x=>x.sold)],['Stock Remaining',sum(rows,x=>x.purchased-x.sold)],['Stock Cost Value',sum(rows,x=>(x.purchased-x.sold)*x.rate)]].map(([k,v])=>`<div class="card"><div class="kicker">${k}</div><div class="amount">${k.includes('Qty')||k==='Stock Remaining'?v:('Rs '+money(v))}</div></div>`).join('');b.innerHTML=rows.length?rows.map(x=>`<tr><td>${esc(x.item)}</td><td class="num">${x.purchased}</td><td class="num">${x.sold}</td><td class="num">${x.purchased-x.sold}</td><td class="num">${money(x.rate)}</td><td class="num">${money((x.purchased-x.sold)*x.rate)}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Add purchases to calculate stock.</td></tr>'}
+function summaryCard(k,v){return `<div class="card"><div class="kicker">${esc(k)}</div><div class="amount">Rs ${money(v)}</div></div>`}
+function renderSummary(){let mR=sum(db.mamuReceipts,x=>x.amount),mS=sum(db.mamuTransfers,x=>x.amount),rollSale=sum(db.mamuRollSales,x=>num(x.qty)*num(x.rate)),rollPay=sum(db.mamuRollPayments,x=>x.amount),noorSale=sum(db.noorSales,x=>num(x.qty)*num(x.rate)),noorPay=sum(db.noorPayments,x=>x.amount),pur=sum(db.catalogicPurchases,x=>num(x.qty)*num(x.rate)),supPay=sum(db.catalogicSupplierPayments,x=>x.amount),sales=sum(db.catalogicSales,x=>num(x.qty)*num(x.rate)),cost=sum(db.catalogicSales,x=>num(x.qty)*num(x.costRate)),custPay=sum(db.catalogicCustomerPayments,x=>x.amount),income=sum(db.personalIncome,x=>x.amount),lent=sum(db.personalLoans,x=>x.amount),repay=sum(db.personalRepayments,x=>x.amount),expense=sum(db.personalExpenses,x=>x.amount);let vals=[['Mamu Funds Difference',mR-mS],['Mamu Barcode Balance',rollSale-rollPay],['Noor Balance Due',noorSale-noorPay],['Catalogic Supplier Due',pur-supPay],['Catalogic Gross Profit',sales-cost],['Catalogic Customer Payments',custPay],['Personal Net Cash',income+repay-expense-lent],['Personal Money Owed to You',lent-repay]];document.getElementById('topSummary').innerHTML=vals.map(([k,v])=>summaryCard(k,v)).join('');document.getElementById('dashboardCards').innerHTML=vals.map(([k,v])=>summaryCard(k,v)).join('')+`<div class="card"><div class="kicker">Catalogic Sales Total</div><div class="amount">Rs ${money(sales)}</div></div><div class="card"><div class="kicker">Catalogic Stock Remaining Qty</div><div class="amount">${sum(db.catalogicPurchases,x=>x.qty)-sum(db.catalogicSales,x=>x.qty)}</div></div>`}
+function download(name,content,type){let blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}function downloadBackup(){download('business-accounts-backup.json',JSON.stringify(db,null,2),'application/json')}function importBackup(e){let file=e.target.files[0];if(!file)return;let r=new FileReader();r.onload=()=>{try{let parsed=JSON.parse(r.result);if(!parsed.mamuReceipts)throw Error();if(confirm('Replace current records with this backup?')){db={...blank(),...parsed};persist();alert('Backup restored.')} }catch(err){alert('Invalid backup file.')}e.target.value=''};r.readAsText(file)}function exportCSV(key){let rows=db[key]||[];if(!rows.length){alert('No records to export.');return}let keys=[...new Set(rows.flatMap(Object.keys))].filter(k=>k!=='id'),q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';download(key+'.csv','\ufeff'+[keys.map(q).join(','),...rows.map(x=>keys.map(k=>q(x[k])).join(','))].join('\r\n'),'text/csv;charset=utf-8')}function downloadAllCSV(){Object.keys(db).forEach(exportCSV)}function clearAll(){if(confirm('Permanently delete all records in this browser? Download backup first.')){db=blank();persist()}}
+renderDefs();renderAll();
+</script></body></html>
